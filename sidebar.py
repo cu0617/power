@@ -68,4 +68,36 @@ def main():
             st.warning("`inverter.py` 파일을 찾을 수 없습니다.")
 
 if __name__ == "__main__":
+
     main()
+
+import pandas as pd
+import os
+
+# 데이터를 저장할 파일 이름
+DB_FILE = "usage_data.csv"
+
+def save_data(date, category, value):
+    # 1. 기존 데이터 불러오기 (파일이 없으면 새로 만듦)
+    if os.path.exists(DB_FILE):
+        df = pd.read_csv(DB_FILE)
+    else:
+        df = pd.DataFrame(columns=["일자", "항목", "검침값"])
+
+    # 2. 새로운 데이터 추가
+    new_row = {"일자": date, "항목": category, "검침값": value}
+    df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+
+    # 3. 파일로 저장
+    df.to_csv(DB_FILE, index=False)
+    st.success(f"{category} 데이터가 안전하게 파일로 저장되었습니다!")
+
+# 화면에 저장된 데이터 보여주기 및 엑셀 다운로드
+if os.path.exists(DB_FILE):
+    st.subheader("📊 누적 검침 기록")
+    view_df = pd.read_csv(DB_FILE)
+    st.dataframe(view_df) # 표 형태로 출력
+    
+    # 엑셀로 내보내기 버튼
+    csv = view_df.to_csv(index=False).encode('utf-8-sig')
+    st.download_button("엑셀 파일로 받기", data=csv, file_name="전기검침기록.csv")
