@@ -61,28 +61,21 @@ def main():
         
         st.info("💡 인쇄 시 브라우저 설정에서 '배경 그래픽'을 체크해 주세요.")
 
-    # 3. 메뉴 선택에 따른 화면 표시
-    if choice == "📊 데이터 조회/다운로드":
-        st.title("📋 누적 검침 데이터베이스")
-        if os.path.exists(DB_FILE):
-            view_df = pd.read_csv(DB_FILE)
-            st.dataframe(view_df, use_container_width=True)
-            
-            # 엑셀 다운로드 기능
-            csv = view_df.to_csv(index=False).encode('utf-8-sig')
-            st.download_button(
-                label="📥 전체 데이터 엑셀(CSV) 다운로드",
-                data=csv,
-                file_name=f"전기검침기록_{datetime.now().strftime('%Y%m%d')}.csv",
-                mime="text/csv"
-            )
-            
-            if st.button("🗑️ 임시: 최신 기록 한 줄 삭제"):
-                 df = pd.read_csv(DB_FILE)
-                 df[:-1].to_csv(DB_FILE, index=False, encoding='utf-8-sig')
-                 st.rerun()
-        else:
-            st.info("아직 저장된 데이터가 없습니다. 검침을 진행해 주세요.")
+   # 3. 메뉴 선택에 따른 화면 표시
+if choice == "📊 데이터 조회/다운로드":
+    st.title("📋 누적 검침 데이터베이스")
+    
+    # 현재 서버에 파일이 있는지 확인
+    if os.path.exists(DB_FILE):
+        view_df = pd.read_csv(DB_FILE)
+        st.write(f"현재 총 {len(view_df)}개의 데이터가 저장되어 있습니다.") # 데이터 개수 표시
+        st.dataframe(view_df, use_container_width=True) # 표 보여주기
+        
+        # 다운로드 버튼이 작동하는지 확인
+        csv = view_df.to_csv(index=False).encode('utf-8-sig')
+        st.download_button("📥 엑셀로 내보내기", csv, "data.csv", "text/csv")
+    else:
+        st.error("⚠️ 아직 저장된 파일이 없습니다. 입력 후 [저장] 버튼을 눌러주세요.")
 
     else:
         # 각 검침 페이지 로드
@@ -103,3 +96,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
