@@ -44,11 +44,14 @@ def show_electricity_meter(date_str):
             val = st.number_input(f"{panel} ({loc})", min_value=0.0, step=0.1, key=f"inp_{panel}")
             input_values[panel] = val
 
-    # 3. 저장 버튼
-    if st.button("💾 데이터 서버 저장 (CSV)"):
+   # electricity_meter.py 하단 수정 예시
+if st.button("💾 데이터 서버 저장"):
+    # 데이터가 비어있지 않은지 확인
+    if any(input_values.values()): 
         save_to_csv(date_str, "계량기 검침", input_values)
-        st.success(f"{date_str} 데이터가 성공적으로 서버에 기록되었습니다!")
-        st.balloons()
+        st.success("✅ 서버 파일에 기록되었습니다! [데이터 조회] 메뉴를 확인하세요.")
+    else:
+        st.warning("⚠️ 입력된 지침 값이 없습니다.")
 
     st.markdown("---")
     
@@ -58,3 +61,4 @@ def show_electricity_meter(date_str):
         # 기존에 만드신 HTML 테이블 생성 로직을 여기에 넣어서 
         # 사용자가 입력한 input_values를 반영해 "보기 전용"으로 띄워줍니다.
         st.write("인쇄용 레이아웃이 여기에 표시됩니다.")
+
