@@ -18,6 +18,20 @@ st.markdown("""
 
 DB_FILE = "usage_data.csv"
 
+# --- 데이터 저장 공통 함수 ---
+def save_to_csv(date, category, data_dict):
+    if os.path.exists(DB_FILE):
+        df = pd.read_csv(DB_FILE)
+    else:
+        df = pd.DataFrame()
+    
+    new_data = {"검침일자": date, "구분": category}
+    new_data.update(data_dict)
+    
+    df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
+    df.to_csv(DB_FILE, index=False, encoding='utf-8-sig')
+    st.success(f"✅ {category} 데이터가 성공적으로 저장되었습니다.")
+
 def main():
     # 2. 사이드바 구성
     with st.sidebar:
@@ -37,7 +51,7 @@ def main():
         selected_date = st.date_input("🗓️ 검침 일자 선택", datetime.now())
         date_str = selected_date.strftime('%Y-%m-%d')
 
-    # 3. 메뉴 선택에 따른 화면 표시 (들여쓰기 주의!)
+    # 3. 메뉴 선택에 따른 화면 표시
     if choice == "📊 데이터 조회/다운로드":
         st.title("📋 누적 검침 데이터베이스")
         if os.path.exists(DB_FILE):
@@ -46,7 +60,7 @@ def main():
             csv = view_df.to_csv(index=False).encode('utf-8-sig')
             st.download_button("📥 엑셀(CSV) 다운로드", csv, "검침기록.csv", "text/csv")
         else:
-            st.info("저장된 데이터가 없습니다.")
+            st.info("저장된 데이터가 없습니다. 먼저 검침 데이터를 입력하고 저장해 주세요.")
 
     elif choice == "계량기 검침":
         try:
@@ -76,5 +90,6 @@ def main():
         except Exception as e:
             st.error(f"파일 로드 오류: {e}")
 
+# 실행부 (함수 밖으로 빼야 합니다)
 if __name__ == "__main__":
     main()
